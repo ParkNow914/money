@@ -36,6 +36,13 @@ autocash-ultimate is an autonomous ecosystem for realistic, scalable revenue gen
 - ✅ Docker development environment
 - ✅ Comprehensive test suite (>75% coverage)
 - ✅ LGPD and security documentation
+- ✅ DSAR endpoints (data export, deletion)
+
+### New in v0.2.0
+- ✅ Content repurposer (threads, videos, emails, PDFs)
+- ✅ Static site publisher with SEO templates
+- ✅ Template system with Jinja2
+- ✅ Batch publishing capabilities
 
 ## 🚀 Quick Start
 
@@ -120,6 +127,10 @@ curl http://localhost:8000/api/articles/{slug}
 - `POST /api/generate` - Generate article from keyword
 - `POST /api/keywords/seed` - Add keyword to seed list
 - `GET /api/keywords` - List keywords
+- `POST /api/publish` - Publish article as static HTML
+- `POST /api/publish-batch` - Batch publish articles
+- `POST /api/repurpose` - Repurpose article to different format
+- `GET /api/admin/status` - System status and health
 
 ### Authentication
 Admin endpoints require Bearer token:
@@ -223,11 +234,11 @@ Key features:
 - [x] LGPD/security checklists
 
 ### Phase 2: Content Pipeline (v0.2.0)
-- [ ] Repurposer service (threads, videos, PDFs, emails)
-- [ ] Publisher service (static site generation)
-- [ ] Template system (Jinja2)
+- [x] Repurposer service (threads, videos, PDFs, emails)
+- [x] Publisher service (static site generation)
+- [x] Template system (Jinja2)
 - [ ] Image generation pipeline
-- [ ] DSAR endpoints (data export, deletion)
+- [x] DSAR endpoints (data export, deletion)
 
 ### Phase 3: Monetization (v0.3.0)
 - [ ] Affiliate link tracking
