@@ -51,10 +51,11 @@ When emergency stop is needed:
    docker-compose restart
    ```
 
-2. **Via Admin Endpoint** (TODO: implement):
+2. **Via Admin Endpoint** (Future implementation):
    ```bash
-   curl -X POST http://localhost:8000/admin/killswitch \
-     -H "Authorization: Bearer $ADMIN_TOKEN"
+   # TODO: Implement admin killswitch endpoint
+   # curl -X POST http://localhost:8000/admin/killswitch \
+   #   -H "Authorization: Bearer $ADMIN_TOKEN"
    ```
 
 3. **Verify Kill Switch**:
@@ -132,8 +133,12 @@ docker-compose up -d
 
 ### Clear Old Data (LGPD Retention)
 ```python
-# Run data retention cleanup
-python scripts/cleanup_old_data.py --days 365
+# TODO: Implement data retention cleanup script
+# python scripts/cleanup_old_data.py --days 365
+
+# Manual cleanup for now:
+# Delete old tracking events
+# DELETE FROM tracking_events WHERE created_at < date('now', '-365 days');
 ```
 
 ### Regenerate Content

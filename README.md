@@ -46,6 +46,7 @@ autocash-ultimate is an autonomous ecosystem for realistic, scalable revenue gen
 
 ### 1. Clone Repository
 ```bash
+# Note: Repository is currently named 'money' but may be renamed to 'autocash-ultimate'
 git clone https://github.com/ParkNow914/money.git
 cd money
 ```

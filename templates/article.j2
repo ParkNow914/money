@@ -51,6 +51,9 @@
         </header>
         
         <div class="content">
+            {# TODO: Add HTML sanitization before production use #}
+            {# For now, body_html is generated internally and trusted #}
+            {# In production, use bleach or similar library to sanitize #}
             {{ body_html|safe }}
         </div>
         
