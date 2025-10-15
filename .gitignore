@@ -115,6 +115,7 @@ Thumbs.db
 # Generated content
 generated_content/
 data/generated/
+revenue_projections.json
 
 # Vector DB
 chroma_db/
