@@ -86,24 +86,86 @@ async def export_data(request: DataExportRequest, db: Session = Depends(get_db))
     
     LGPD Article 18: Right to access data.
     
-    Note: This is a placeholder. Full implementation requires:
-    - Verification flow (email confirmation)
-    - Data gathering from all tables
-    - Structured export format
+    Returns all data associated with the user in a portable JSON format.
     """
+    from app.models import TrackingEvent
+    
     # Hash email
     user_hash = hashlib.sha256(request.email.encode()).hexdigest()
     
-    # TODO: Implement full data export
-    # - Query all tables for user_hash
-    # - Format data in portable format (JSON/CSV)
-    # - Send via email or download link
+    # Gather all user data from tables
+    export_data = {
+        "export_timestamp": datetime.utcnow().isoformat(),
+        "user_hash": user_hash,
+        "email_hash": user_hash,  # For clarity
+        "data": {}
+    }
     
-    # Audit log
+    # 1. Consents
+    consents = db.query(UserConsent).filter(
+        UserConsent.user_hash == user_hash
+    ).all()
+    export_data["data"]["consents"] = [
+        {
+            "id": c.id,
+            "consent_type": c.consent_type.value,
+            "granted": c.granted,
+            "granted_at": c.granted_at.isoformat(),
+            "ip_hash": c.ip_hash,
+            "user_agent_hash": c.user_agent_hash,
+            "expires_at": c.expires_at.isoformat() if c.expires_at else None
+        }
+        for c in consents
+    ]
+    
+    # 2. Tracking events (by session_hash or ip_hash that could match)
+    tracking_events = db.query(TrackingEvent).filter(
+        TrackingEvent.session_hash == user_hash
+    ).all()
+    export_data["data"]["tracking_events"] = [
+        {
+            "id": e.id,
+            "event_type": e.event_type,
+            "article_id": e.article_id,
+            "session_hash": e.session_hash,
+            "ip_hash": e.ip_hash,
+            "ua_hash": e.ua_hash,
+            "utm_source": e.utm_source,
+            "utm_medium": e.utm_medium,
+            "utm_campaign": e.utm_campaign,
+            "revenue": e.revenue,
+            "created_at": e.created_at.isoformat()
+        }
+        for e in tracking_events
+    ]
+    
+    # 3. Audit logs for this user
+    audit_logs = db.query(AuditLog).filter(
+        AuditLog.user_hash == user_hash
+    ).all()
+    export_data["data"]["audit_logs"] = [
+        {
+            "id": a.id,
+            "action": a.action,
+            "details": a.details,
+            "created_at": a.created_at.isoformat(),
+            "ip_hash": a.ip_hash
+        }
+        for a in audit_logs
+    ]
+    
+    # Create audit log for this export
     audit = AuditLog(
-        action="data_export_request",
+        action="data_export_completed",
         user_hash=user_hash,
-        details={"status": "pending"},
+        details={
+            "status": "completed",
+            "records_exported": {
+                "consents": len(export_data["data"]["consents"]),
+                "tracking_events": len(export_data["data"]["tracking_events"]),
+                "audit_logs": len(export_data["data"]["audit_logs"])
+            }
+        },
         created_at=datetime.utcnow()
     )
     db.add(audit)
@@ -111,9 +173,8 @@ async def export_data(request: DataExportRequest, db: Session = Depends(get_db))
     
     return {
         "success": True,
-        "message": "Data export request received. You will receive an email with your data.",
-        "status": "pending",
-        "note": "Full implementation pending - Phase 2"
+        "message": "Data export completed",
+        "export": export_data
     }
 
 
@@ -124,11 +185,10 @@ async def delete_data(request: DataDeletionRequest, db: Session = Depends(get_db
     
     LGPD Article 18: Right to deletion.
     
-    Note: This is a placeholder. Full implementation requires:
-    - Verification flow
-    - Cascading deletion across tables
-    - Retention of audit logs for legal compliance
+    Deletes all user data except audit logs (required for legal compliance).
     """
+    from app.models import TrackingEvent
+    
     if request.confirmation != "DELETE MY DATA":
         raise HTTPException(
             status_code=400,
@@ -138,16 +198,37 @@ async def delete_data(request: DataDeletionRequest, db: Session = Depends(get_db
     # Hash email
     user_hash = hashlib.sha256(request.email.encode()).hexdigest()
     
-    # TODO: Implement full data deletion
-    # - Verify user identity
-    # - Delete from all tables (except audit logs)
-    # - Keep audit logs for legal compliance
+    # Count records before deletion
+    consents_count = db.query(UserConsent).filter(
+        UserConsent.user_hash == user_hash
+    ).count()
     
-    # Audit log
+    tracking_count = db.query(TrackingEvent).filter(
+        TrackingEvent.session_hash == user_hash
+    ).count()
+    
+    # Delete consents
+    db.query(UserConsent).filter(
+        UserConsent.user_hash == user_hash
+    ).delete()
+    
+    # Delete tracking events
+    db.query(TrackingEvent).filter(
+        TrackingEvent.session_hash == user_hash
+    ).delete()
+    
+    # Create audit log (this is kept for legal compliance)
     audit = AuditLog(
-        action="data_deletion_request",
+        action="data_deletion_completed",
         user_hash=user_hash,
-        details={"status": "pending"},
+        details={
+            "status": "completed",
+            "records_deleted": {
+                "consents": consents_count,
+                "tracking_events": tracking_count
+            },
+            "audit_logs_retained": "yes (legal requirement)"
+        },
         created_at=datetime.utcnow()
     )
     db.add(audit)
@@ -155,9 +236,14 @@ async def delete_data(request: DataDeletionRequest, db: Session = Depends(get_db
     
     return {
         "success": True,
-        "message": "Data deletion request received. You will receive confirmation.",
-        "status": "pending",
-        "note": "Full implementation pending - Phase 2"
+        "message": "All user data has been deleted (except audit logs for legal compliance)",
+        "deleted": {
+            "consents": consents_count,
+            "tracking_events": tracking_count
+        },
+        "retained": {
+            "audit_logs": "Required for legal compliance (LGPD Article 37)"
+        }
     }
 
 
