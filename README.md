@@ -39,6 +39,8 @@ autocash-ultimate is an autonomous ecosystem for realistic, scalable revenue gen
 
 ## 🚀 Quick Start
 
+**New to autocash-ultimate?** → See [QUICKSTART.md](docs/QUICKSTART.md) for a 5-minute setup guide!
+
 ### Prerequisites
 - Docker & Docker Compose
 - Python 3.11+ (for local development)
