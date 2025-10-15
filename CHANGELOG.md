@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-10-15
+
+### Added
+- **Monetization Features**: Complete Phase 3 implementation
+  - Affiliate link management system
+  - EPC (Earnings Per Click) calculator
+  - Revenue tracking and reporting
+  - Top performing links analytics
+  - Revenue breakdown by UTM source
+  - Conversion tracking and reporting
+- **New Database Model**: `AffiliateLink` for managing affiliate partnerships
+- **Monetization Service**: Core business logic for revenue analytics
+- **API Endpoints**:
+  - `POST /api/monetization/affiliate-links` - Create affiliate link
+  - `GET /api/monetization/affiliate-links/{link_id}` - Get link stats
+  - `PUT /api/monetization/affiliate-links/{link_id}` - Update link
+  - `GET /api/monetization/affiliate-links` - List all links
+  - `POST /api/monetization/conversions` - Report conversion
+  - `GET /api/monetization/revenue/period` - Revenue by time period
+  - `GET /api/monetization/revenue/top-links` - Top performing links
+  - `GET /api/monetization/revenue/by-source` - Revenue by UTM source
+  - `GET /api/monetization/epc` - Calculate EPC utility
+- **Enhanced Tracking**: Integrated affiliate link tracking with existing click tracking
+- **Tests**: Added 8 comprehensive monetization tests
+  - Total test count: 49 tests (all passing)
+
+### Changed
+- Updated tracking route to integrate with affiliate link database
+- Affiliate links now tracked automatically on clicks
+- Revenue and conversion data linked to affiliate programs
+
 ## [0.2.0] - 2025-10-15
 
 ### Added

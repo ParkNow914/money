@@ -46,10 +46,17 @@ async def track_click(
     
     Example: /api/tracking/out?aid=amazon123&post=article-slug&utm_source=google
     """
+    from app.models import AffiliateLink
+    
     # Get article if post slug provided
     article = None
     if post:
         article = db.query(Article).filter(Article.slug == post).first()
+    
+    # Get affiliate link
+    affiliate_link = db.query(AffiliateLink).filter(
+        AffiliateLink.link_id == aid
+    ).first()
     
     # Generate session hash from request
     session_data = f"{request.client.host}{request.headers.get('user-agent', '')}{datetime.utcnow().date()}"
@@ -79,10 +86,21 @@ async def track_click(
     )
     
     db.add(event)
+    
+    # Update affiliate link stats if found
+    if affiliate_link:
+        affiliate_link.clicks += 1
+        affiliate_link.last_click_at = datetime.utcnow()
+        affiliate_link.updated_at = datetime.utcnow()
+    
     db.commit()
     
-    # TODO: Get actual redirect URL from affiliate link database
-    redirect_url = f"https://example.com/affiliate/{aid}"
+    # Get redirect URL
+    if affiliate_link:
+        redirect_url = affiliate_link.destination_url
+    else:
+        # Fallback URL if link not found
+        redirect_url = f"https://example.com/affiliate/{aid}"
     
     return RedirectResponse(url=redirect_url, status_code=302)
 

@@ -241,11 +241,11 @@ Key features:
 - [x] DSAR endpoints (data export, deletion)
 
 ### Phase 3: Monetization (v0.3.0)
-- [ ] Affiliate link tracking
-- [ ] Click tracking with privacy compliance
-- [ ] UTM parameter handling
-- [ ] EPC (Earnings Per Click) calculator
-- [ ] Revenue reporting
+- [x] Affiliate link tracking
+- [x] Click tracking with privacy compliance
+- [x] UTM parameter handling
+- [x] EPC (Earnings Per Click) calculator
+- [x] Revenue reporting
 
 ### Phase 4: Optimization (v0.4.0)
 - [ ] A/B testing framework

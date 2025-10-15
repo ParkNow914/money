@@ -70,6 +70,7 @@ class Article(Base):
     # Relationships
     repurposed_content = relationship("RepurposedContent", back_populates="article")
     tracking_events = relationship("TrackingEvent", back_populates="article")
+    affiliate_links = relationship("AffiliateLink", back_populates="article")
 
 
 class RepurposedContent(Base):
@@ -140,6 +141,46 @@ class TrackingEvent(Base):
     
     # Relationships
     article = relationship("Article", back_populates="tracking_events")
+
+
+class AffiliateLink(Base):
+    """Affiliate link management for monetization."""
+    __tablename__ = "affiliate_links"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    
+    # Link identification
+    link_id = Column(String(100), unique=True, index=True, nullable=False)  # e.g., "amazon-product-123"
+    name = Column(String(255), nullable=False)  # Descriptive name
+    
+    # Link details
+    destination_url = Column(String(1000), nullable=False)  # Actual affiliate URL
+    product_name = Column(String(255), nullable=True)
+    product_category = Column(String(100), nullable=True)
+    
+    # Affiliate program
+    affiliate_program = Column(String(100), nullable=False)  # amazon, clickbank, etc.
+    commission_rate = Column(Float, nullable=True)  # Percentage or fixed amount
+    commission_type = Column(String(20), nullable=True)  # percentage, fixed, cpa
+    
+    # Performance tracking
+    clicks = Column(Integer, default=0, nullable=False)
+    conversions = Column(Integer, default=0, nullable=False)
+    revenue = Column(Float, default=0.0, nullable=False)
+    
+    # Article association (optional - link can be used across multiple articles)
+    article_id = Column(Integer, ForeignKey("articles.id"), nullable=True)
+    
+    # Status
+    is_active = Column(Boolean, default=True, nullable=False)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_click_at = Column(DateTime, nullable=True)
+    
+    # Relationships
+    article = relationship("Article", back_populates="affiliate_links")
 
 
 class Keyword(Base):
