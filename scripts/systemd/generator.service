@@ -1,0 +1,16 @@
+[Unit]
+Description=autocash-ultimate Content Generator
+After=network.target docker.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/autocash-ultimate
+Environment="ADMIN_TOKEN=your-admin-token-here"
+ExecStart=/usr/bin/curl -X POST http://localhost:8000/api/generate \
+  -H "Authorization: ******" \
+  -H "Content-Type: application/json" \
+  -d '{"keyword": "auto-generated", "review_required": true}'
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ meta_description }}">
+    <meta name="keywords" content="{{ tags|join(', ') }}">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ title }}">
+    <meta property="og:description" content="{{ meta_description }}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ canonical_url }}">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ title }}">
+    <meta name="twitter:description" content="{{ meta_description }}">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="{{ canonical_url }}">
+    
+    <title>{{ title }}</title>
+    
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "{{ title }}",
+      "description": "{{ meta_description }}",
+      "keywords": "{{ tags|join(', ') }}",
+      "datePublished": "{{ created_at }}",
+      "dateModified": "{{ updated_at or created_at }}",
+      "author": {
+        "@type": "Organization",
+        "name": "{{ site_name }}"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "{{ site_name }}"
+      }
+    }
+    </script>
+</head>
+<body>
+    <article>
+        <header>
+            <h1>{{ title }}</h1>
+            <p class="meta">Published: {{ created_at }}</p>
+        </header>
+        
+        <div class="content">
+            {# TODO: Add HTML sanitization before production use #}
+            {# For now, body_html is generated internally and trusted #}
+            {# In production, use bleach or similar library to sanitize #}
+            {{ body_html|safe }}
+        </div>
+        
+        <footer>
+            <div class="tags">
+                {% for tag in tags %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </footer>
+    </article>
+</body>
+</html>
