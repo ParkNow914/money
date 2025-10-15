@@ -77,8 +77,7 @@ out/
 .vercel
 
 # Build artifacts
-site-out/posts/
-site-out/assets/generated/
+site-out/
 *.pdf
 *.png
 *.jpg

@@ -89,7 +89,15 @@ class ContentGenerator:
         return headings
     
     def generate_body_section(self, heading: Dict[str, str], keyword: str) -> str:
-        """Generate content for a section based on heading."""
+        """
+        Generate content for a section based on heading.
+        
+        Note: This uses template-based content generation for MVP.
+        In production, replace with:
+        - LLM-based content generation (OpenAI, Claude, etc.)
+        - Human-written content
+        - Content from other sources with proper attribution
+        """
         heading_text = heading["text"]
         
         # Template paragraphs (in production, would use LLM or more sophisticated generation)
@@ -127,15 +135,18 @@ class ContentGenerator:
             level = heading["level"]
             text = heading["text"]
             
+            # Skip H1 entirely (will be rendered as page title in template)
+            if level == "h1":
+                continue
+            
             # Add heading
             html_parts.append(f"<{level}>{text}</{level}>")
             plain_parts.append(f"\n{'#' * int(level[1])} {text}\n")
             
-            # Add section content (skip for h1)
-            if level != "h1":
-                section_content = self.generate_body_section(heading, keyword)
-                html_parts.append(f"<div class='section'>{section_content}</div>")
-                plain_parts.append(section_content)
+            # Add section content
+            section_content = self.generate_body_section(heading, keyword)
+            html_parts.append(f"<div class='section'>{section_content}</div>")
+            plain_parts.append(section_content)
         
         html_body = "\n\n".join(html_parts)
         plain_body = "\n\n".join(plain_parts)
