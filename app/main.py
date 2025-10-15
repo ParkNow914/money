@@ -143,7 +143,7 @@ async def health_check():
 
 
 # Import and include routers
-from app.routes import generate, metrics, tracking, privacy, admin, batch_generate
+from app.routes import generate, metrics, tracking, privacy, admin, batch_generate, publisher, repurposer
 
 app.include_router(generate.router, prefix="/api", tags=["content"])
 app.include_router(metrics.router, prefix="/api", tags=["monitoring"])
@@ -151,6 +151,8 @@ app.include_router(tracking.router, prefix="/api/tracking", tags=["tracking"])
 app.include_router(privacy.router, prefix="/api/privacy", tags=["privacy"])
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 app.include_router(batch_generate.router, prefix="/api", tags=["batch"])
+app.include_router(publisher.router, prefix="/api", tags=["publisher"])
+app.include_router(repurposer.router, prefix="/api", tags=["repurposer"])
 
 
 if __name__ == "__main__":
