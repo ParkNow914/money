@@ -72,7 +72,9 @@ def test_generate_body_html():
     
     assert len(html_body) > 0
     assert len(plain_body) > 0
-    assert "<h1>" in html_body
+    # H1 is skipped in body (rendered as page title in template)
+    assert "<h2>" in html_body
+    assert "<h3>" in html_body
     assert "<h2>" in html_body
     assert keyword in plain_body.lower()
 

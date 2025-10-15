@@ -89,39 +89,42 @@ class ContentGenerator:
         return headings
     
     def generate_body_section(self, heading: Dict[str, str], keyword: str) -> str:
-        """Generate content for a section based on heading."""
+        """
+        Generate content for a section based on heading.
+        
+        Note: This uses template-based content generation for MVP.
+        In production, replace with:
+        - LLM-based content generation (OpenAI, Claude, etc.)
+        - Human-written content
+        - Content from other sources with proper attribution
+        """
         heading_text = heading["text"]
         
-        # Generate 2-4 paragraphs per section
-        num_paragraphs = random.randint(2, 4)
-        paragraphs = []
+        # Template paragraphs (in production, would use LLM or more sophisticated generation)
+        templates = [
+            f"When it comes to {keyword}, understanding the fundamentals is crucial for success. "
+            f"This aspect of {heading_text.lower()} plays a vital role in achieving your goals. "
+            f"By focusing on the key principles and best practices, you can develop a strong foundation "
+            f"that will serve you well as you progress in your journey.",
+            
+            f"Many people overlook the importance of {heading_text.lower()} when working with {keyword}. "
+            f"However, experienced practitioners know that paying attention to these details can make "
+            f"a significant difference in your results. Taking the time to master this area will pay "
+            f"dividends in the long run and help you avoid common pitfalls.",
+            
+            f"The key to success with {keyword} lies in consistent application of proven strategies. "
+            f"When addressing {heading_text.lower()}, it's essential to maintain a systematic approach. "
+            f"Start with the basics, build your knowledge gradually, and don't be afraid to experiment "
+            f"with different techniques to find what works best for your specific situation.",
+            
+            f"Research has shown that focusing on {heading_text.lower()} is one of the most effective ways "
+            f"to improve your {keyword} outcomes. By implementing the right strategies and staying committed "
+            f"to continuous improvement, you can achieve remarkable results. Remember that success doesn't "
+            f"happen overnight – it requires patience, persistence, and a willingness to learn from experience.",
+        ]
         
-        for i in range(num_paragraphs):
-            # Template paragraphs (in production, would use LLM or more sophisticated generation)
-            templates = [
-                f"When it comes to {keyword}, understanding the fundamentals is crucial for success. "
-                f"This aspect of {heading_text.lower()} plays a vital role in achieving your goals. "
-                f"By focusing on the key principles and best practices, you can develop a strong foundation "
-                f"that will serve you well as you progress in your journey.",
-                
-                f"Many people overlook the importance of {heading_text.lower()} when working with {keyword}. "
-                f"However, experienced practitioners know that paying attention to these details can make "
-                f"a significant difference in your results. Taking the time to master this area will pay "
-                f"dividends in the long run and help you avoid common pitfalls.",
-                
-                f"The key to success with {keyword} lies in consistent application of proven strategies. "
-                f"When addressing {heading_text.lower()}, it's essential to maintain a systematic approach. "
-                f"Start with the basics, build your knowledge gradually, and don't be afraid to experiment "
-                f"with different techniques to find what works best for your specific situation.",
-                
-                f"Research has shown that focusing on {heading_text.lower()} is one of the most effective ways "
-                f"to improve your {keyword} outcomes. By implementing the right strategies and staying committed "
-                f"to continuous improvement, you can achieve remarkable results. Remember that success doesn't "
-                f"happen overnight – it requires patience, persistence, and a willingness to learn from experience.",
-            ]
-            paragraphs.append(random.choice(templates))
-        
-        return "\n\n".join(paragraphs)
+        # Return just one paragraph per section to stay within word count limits
+        return random.choice(templates)
     
     def generate_body_html(self, keyword: str, headings: List[Dict[str, str]]) -> Tuple[str, str]:
         """Generate HTML and plain text body content."""
@@ -132,15 +135,18 @@ class ContentGenerator:
             level = heading["level"]
             text = heading["text"]
             
+            # Skip H1 entirely (will be rendered as page title in template)
+            if level == "h1":
+                continue
+            
             # Add heading
             html_parts.append(f"<{level}>{text}</{level}>")
             plain_parts.append(f"\n{'#' * int(level[1])} {text}\n")
             
-            # Add section content (skip for h1)
-            if level != "h1":
-                section_content = self.generate_body_section(heading, keyword)
-                html_parts.append(f"<div class='section'>{section_content}</div>")
-                plain_parts.append(section_content)
+            # Add section content
+            section_content = self.generate_body_section(heading, keyword)
+            html_parts.append(f"<div class='section'>{section_content}</div>")
+            plain_parts.append(section_content)
         
         html_body = "\n\n".join(html_parts)
         plain_body = "\n\n".join(plain_parts)
