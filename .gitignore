@@ -1,0 +1,142 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+coverage.xml
+*.cover
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.secret
+
+# Secrets (NEVER COMMIT!)
+secrets/
+*.key
+*.pem
+*.p12
+credentials.json
+service-account.json
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+data/*.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+.next/
+out/
+site-out/
+.cache/
+
+# Docker
+docker-compose.override.yml
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform.lock.hcl
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Generated files
+examples/sample_posts.json
+data/generated/
+tmp/
+
+# Kill-switch
+/tmp/killswitch.lock
+killswitch.lock
+
+# Backups
+*.backup
+*.bak
+backups/
+
+# User data (privacy)
+data/users/
+data/consent/
+exports/
+
+# Object Storage local cache
+storage/
+uploads/
+
+# Vector DB data
+chroma_data/
+qdrant_data/
+
+# Redis dumps
+dump.rdb
+
+# Prometheus data
+prometheus_data/
+
+# Grafana data
+grafana_data/
+
+# MeiliSearch data
+meili_data/
+
+# Node modules (if Next.js in repo)
+node_modules/
+package-lock.json
+yarn.lock
