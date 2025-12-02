@@ -21,14 +21,17 @@ import { scheduleBillingWorker } from "./workers/billingWorker";
 
 const logger = pino({ name: "api" });
 const ADMIN_KEY = process.env.ADMIN_API_KEY || "admin";
+const SENTRY_DSN = process.env.SENTRY_DSN;
+const SENTRY_SAMPLE_RATE = Number(process.env.SENTRY_TRACES_SAMPLE_RATE || "0.1");
+const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || "development";
 
-if (process.env.SENTRY_DSN) {
-  Sentry.init({ dsn: process.env.SENTRY_DSN, tracesSampleRate: 0.1 });
+if (SENTRY_DSN) {
+  Sentry.init({ dsn: SENTRY_DSN, tracesSampleRate: SENTRY_SAMPLE_RATE, environment: SENTRY_ENVIRONMENT });
 }
 
 export const app = express();
 
-if (process.env.SENTRY_DSN) {
+if (SENTRY_DSN) {
   app.use(Sentry.Handlers.requestHandler());
 }
 
@@ -61,7 +64,7 @@ app.use("/api/v1", jobsRouter);
 app.use("/api/v1", kycRouter);
 app.use("/webhooks", webhooksRouter);
 
-if (process.env.SENTRY_DSN) {
+if (SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler());
 }
 
