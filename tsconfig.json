@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "vitest"],
+    "outDir": "dist"
+  },
+  "include": ["backend/src", "frontend/src", "tests", "vitest.config.ts"]
+}

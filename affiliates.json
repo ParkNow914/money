@@ -1,0 +1,13 @@
+{
+  "defaultTracker": "trk-free-tier",
+  "rules": [
+    {
+      "keyword": "hospedagem",
+      "url": "https://afiliado.example.com/hosting?ref=trk-free-tier"
+    },
+    {
+      "keyword": "marketing",
+      "url": "https://afiliado.example.com/marketing?ref=trk-free-tier"
+    }
+  ]
+}

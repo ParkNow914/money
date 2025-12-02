@@ -1,249 +1,99 @@
-# AutoCash Ultimate 🚀
+# Always Free Money Stack
 
-**ECOSSISTEMA AUTÔNOMO, PRIVACY-FIRST, MULTICANAL E ORQUESTRADO** para maximização realista e escalável de receitas partindo de ZERO aporte.
+Plataforma "always free" com monetização invisível por trás (afiliados, marketplace, dados e API). Todo o stack roda com zero investimento inicial usando apenas free tiers ou fallbacks locais.
 
-[![CI Status](https://github.com/yourusername/autocash-ultimate/workflows/CI/badge.svg)](https://github.com/yourusername/autocash-ultimate/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Coverage](https://img.shields.io/badge/coverage-75%25-green.svg)](./tests)
+## Visão geral
 
-## 🎯 Princípios Absolutos
+- **Backend**: Node.js + Express em TypeScript com arquitetura modular, ledger append-only, quotas, antifraude, cache (Redis/ memória) e workers (ETL + billing).
+- **Frontend**: React + Vite em TypeScript com páginas Home, Demo IA, Marketplace e Admin, incluindo placeholders de anúncios e chamadas reais ao backend.
+- **Infra**: Esqueleto Terraform (VPC/RDS/S3/EKS opcionais) pronto para quando você sair do modo free.
+- **DevOps**: GitHub Actions para lint, build e testes; script `scripts/start-local.sh` para dev rápido; exemplos de `.env` cobrindo todas as integrações.
 
-- ✅ **Legalidade e Ética**: Proibido qualquer prática fraudulenta
-- 🔒 **Privacy by Design**: LGPD compliant, consentimento explícito
-- 🛡️ **Security First**: Nunca commitar segredos, criptografia at-rest
-- 👁️ **Human Review**: `review_required=true` por padrão
-- 🆓 **Free-Tier First**: Oracle Cloud, Cloudflare Workers, GitHub Pages
-- 🔴 **Kill-Switch**: Pausa operacional via endpoint ou arquivo
+## Como rodar gratuitamente (local)
 
-## 🏗️ Stack Tecnológica
+1. **Clone o repo** e acesse a pasta.
+2. **Copie variáveis**: `cp .env.example .env` (ou rode `scripts/start-local.sh`).
+3. **Instale dependências**: `npm install` (workspace raiz cuida de backend e frontend).
+4. **Dev servers**: `npm run dev` levanta backend (porta 4000) e frontend (porta 5173) via `concurrently`.
+5. **Health-check**: `curl http://localhost:4000/health` deve retornar `{"status":"ok"...}`.
+6. **Frontend**: abra `http://localhost:5173` e navegue pelas páginas.
 
-- **Backend/API**: FastAPI (Python 3.11+) + Uvicorn
-- **Database**: SQLite (MVP) → PostgreSQL ready
-- **Search**: MeiliSearch (OSS) para indexação textual
-- **Vector DB**: Chroma (local) para embeddings e personalização
-- **Cache/Queue**: Redis (docker) ou RQ
-- **Edge**: Cloudflare Workers + Pages
-- **Frontend**: Next.js (App Router) com SSG/ISR
-- **Analytics**: Matomo (privacy-first) + Prometheus/Grafana
-- **Testing**: pytest (coverage >= 75%), bandit (SAST)
-- **CI/CD**: GitHub Actions
-- **IaC**: Terraform (Oracle + Cloudflare)
+## Variáveis de ambiente chave
 
-## 🚀 Quick Start (Local Development)
+Veja `.env.example`. Todas têm fallback gratuito:
 
-### Pré-requisitos
+| Variável | Descrição | Fallback quando vazio |
+| --- | --- | --- |
+| `HF_API_KEY` | Hugging Face Inference | Gerador determinístico local |
+| `REDIS_URL` | Cache gerenciado (Upstash) | Map in-memory + TTL |
+| `STRIPE_KEY` / `STRIPE_WEBHOOK_SECRET` | Pagamentos automatizados | Faturas JSON locais + fluxo manual |
+| `DATABASE_URL` / Supabase | Persistência quotas/marketplace | Arquivos JSON em `data/` |
+| `SENTRY_DSN` | Observabilidade | Logs pino + console |
+| `AFFILIATE_DEFAULT_TRACKER` | Rastreador padrão | Links estáticos |
 
-- Docker & Docker Compose
-- Python 3.11+
-- Git
+## Deploy 100% free
 
-### Passo 1: Clone e Configure
+- **Backend**: pode ser publicado no Render free, Railway ou fly.io. Basta apontar `npm run start` e definir as envs desejadas.
+- **Frontend**: pronto para Vercel (Vite). Crie `deploy.yml` baseado no stub da pipeline.
+- **Banco/Cache**: conecte Supabase free tier e Upstash Redis (grátis) quando precisar de persistência multi-instância.
 
-```bash
-git clone https://github.com/yourusername/autocash-ultimate.git
-cd autocash-ultimate
-cp .env.example .env
-# Edite .env com suas configurações (sem segredos reais!)
+### Passo a passo (exemplo Vercel)
+
+1. Instale o [Vercel CLI](https://vercel.com/docs/cli) e rode `vercel` no diretório `frontend`.
+2. Configure `VITE_API_BASE` para o endpoint do backend.
+3. Para backend em Railway: `railway up` com `PORT=4000` e `.env` exportado.
+
+## Monetização embutida
+
+- **Afiliados**: `backend/src/services/affiliate.ts` lê `affiliates.json` e injeta links nas respostas IA + frontend renderiza em `ResultCard`.
+- **Marketplace**: upload/purchase registra ledger (`data/ledger.jsonl`). `POST /api/v1/checkout` simula Stripe quando não houver chave.
+- **Ads**: backend serve `/api/v1/marketplace/ads/slot` a partir de `adsdb.json`; frontend mostra bloco patrocinado.
+- **Dados**: worker `etlWorker` gera `data/telemetry-dataset.json` (consultado em `/api/v1/admin/data/catalog`).
+- **API-as-a-product**: parceiros enviam `x-api-key` (mesmo valor de `ADMIN_API_KEY` na demo) e recebem quotas maiores.
+
+## Segurança, fraude e compliance
+
+- Quotas/daily budgets (`middleware/metering.ts` + `services/circuitBreaker.ts`).
+- Detecção simples de abuso (`services/fraud.ts`).
+- Ledger append-only (`data/ledger.jsonl`) + invoices JSON.
+- KYC progressivo via `POST /api/v1/kyc/submit` salvando em `data/kycRequests.json`.
+- Fingerprinting básico (hash IP + user-agent) disponível em `req.fingerprint`.
+
+## Testes e CI
+
+- **Unitários**: `tests/backend.test.ts`, `tests/cache.test.ts` rodam com `npm test` (Vitest configurado no monorepo).
+- **CI**: `.github/workflows/ci.yml` executa lint, build e testes em cada PR/push.
+
+## Scripts úteis
+
+- `npm run dev` – backend + frontend.
+- `npm run build` – transpila backend (`tsc`) e frontend (`vite build`).
+- `npm run test` – Vitest em modo `run`.
+- `npm run lint` – ESLint (TS + React) em ambos pacotes.
+- `scripts/start-local.sh` – instala dependências e sobe tudo automaticamente (Linux/macOS/WSL).
+
+## Integrações opcionais
+
+- **Hugging Face**: crie uma *free API token*, defina `HF_API_KEY` e modelos específicos (ex: `HF_MODEL_LITE`).
+- **Stripe**: defina `STRIPE_KEY` + `STRIPE_WEBHOOK_SECRET` para capturar pagamentos reais no `billingWorker` e nas rotas `/webhooks/stripe`.
+- **Supabase**: preencha `SUPABASE_URL` + `SUPABASE_SERVICE_KEY` e plugue suas tabelas (arquivo `services/quotas.ts` preparado para estender).
+- **Upstash Redis**: defina `REDIS_URL` e `REDIS_TOKEN` para cache e metering distribuídos.
+
+## Estrutura de pastas
+
+```text
+backend/          # Express + serviços + workers
+frontend/         # React + Vite
+infra/terraform/  # IaC skeleton
+scripts/          # utilidades de dev
+.tests/           # Vitest (unit + integration)
+.github/workflows # CI
 ```
 
-### Passo 2: Build e Start
+## Roadmap sugerido
 
-```bash
-docker-compose up --build
-```
+Veja `ISSUES_TO_AUTOGENERATE.md` para ideias de issues (Stripe Connect, Upstash, header bidding, cluster privado de inferência).
 
-Serviços disponíveis:
-- API: http://localhost:8000
-- Docs: http://localhost:8000/docs
-- MeiliSearch: http://localhost:7700
-- Redis: localhost:6379
+## Licença
 
-### Passo 3: Seed Keywords e Gerar Posts
-
-```bash
-# Carregar keywords iniciais
-bash scripts/seed-keywords.sh
-
-# Gerar 5 posts de exemplo
-docker-compose exec api python -m app.cli generate --count 5
-```
-
-Os posts gerados estarão em `examples/sample_posts.json` e no banco de dados.
-
-## 📁 Estrutura do Repositório
-
-```
-/
-├── app/                    # Backend FastAPI
-│   ├── main.py            # Entry point
-│   ├── config.py          # Configurações centralizadas
-│   ├── db.py              # Database setup
-│   ├── models.py          # SQLAlchemy models
-│   ├── routes/            # API endpoints
-│   └── services/          # Business logic
-├── data/                  # Dados seed
-├── docker/                # Dockerfiles e compose
-├── docs/                  # Documentação detalhada
-├── scripts/               # Scripts operacionais
-├── terraform/             # Infrastructure as Code
-├── tests/                 # Testes unitários e E2E
-└── tools/                 # Ferramentas auxiliares
-```
-
-## 🔐 Configuração de Segredos (GitHub Secrets)
-
-⚠️ **NUNCA commite segredos no código!**
-
-Configure os seguintes secrets no GitHub:
-
-```
-OPENAI_API_KEY          # (opcional) Para geração avançada
-CLOUDFLARE_API_TOKEN    # Para deploy Workers
-ORACLE_CREDENTIALS      # JSON com credenciais Oracle Cloud
-SMTP_PASSWORD           # Para envio de emails
-MATOMO_AUTH_TOKEN       # Para analytics
-```
-
-### Como adicionar:
-1. Vá em Settings > Secrets and variables > Actions
-2. Click "New repository secret"
-3. Adicione cada secret acima
-
-## 🧪 Testes
-
-```bash
-# Rodar todos os testes
-pytest tests/ -v --cov=app --cov-report=html
-
-# Apenas testes do generator
-pytest tests/test_generator.py -v
-
-# Com coverage report
-pytest --cov=app --cov-report=term-missing
-```
-
-**Coverage mínimo exigido: 75% (core modules)**
-
-## 📊 Funcionalidades MVP (PR1)
-
-- ✅ Generator Core: Gera artigos de 700-1200 palavras com SEO
-- ✅ Keyword Seeding: Importa keywords de CSV
-- ✅ Originalidade: Check de similaridade antes de criar
-- ✅ Database: SQLite com models completos
-- ✅ Tests: Cobertura >= 75% em services/generator.py
-- ✅ Sample Posts: 5 posts de alta qualidade gerados
-
-## 🛣️ Roadmap (90 dias)
-
-### Semana 1-2: MVP Generator ✅
-- [x] Setup repositório
-- [x] Generator core
-- [x] Tests e CI
-- [x] Docker compose
-
-### Semana 3-4: Publisher & Site
-- [ ] Static site generation (Next.js)
-- [ ] SEO otimizado (JSON-LD, sitemap)
-- [ ] Deploy para GitHub Pages
-
-### Semana 5-6: Tracking & Monetization
-- [ ] Affiliate tracking com privacy
-- [ ] UTM auto-injection
-- [ ] EPC estimator
-
-### Semana 7-8: Repurposer & Multi-canal
-- [ ] Thread X generator
-- [ ] Video scripts
-- [ ] Email sequences
-- [ ] PDF lead magnets
-
-### Semana 9-10: Personalization & Vector Search
-- [ ] Embeddings pipeline
-- [ ] Vector store integration
-- [ ] Recommendation engine
-
-### Semana 11-12: Optimizer & Growth
-- [ ] A/B testing framework
-- [ ] Multi-armed bandits
-- [ ] Auto-optimizer
-
-## 📋 Compliance & Segurança
-
-### LGPD Compliance ✅
-- Double opt-in para emails
-- Registro de consentimento granular
-- DSAR endpoints (/privacy/export, /privacy/delete)
-- Data minimization (apenas dados necessários)
-- Retenção configurável (12 meses padrão)
-- DPA templates em `/docs/dpa_template.md`
-
-Ver checklist completo: [docs/lgpd_checklist.md](./docs/lgpd_checklist.md)
-
-### Security Checklist ✅
-- ✅ Senhas hashed com Argon2
-- ✅ Secrets via env/vault (nunca em código)
-- ✅ Rate limiting em APIs
-- ✅ SAST com bandit
-- ✅ Dependency scanning
-- ✅ CSP, HSTS, security headers
-- ✅ Encryption at-rest (AES-256)
-
-Ver checklist completo: [docs/security_checklist.md](./docs/security_checklist.md)
-
-## 🚨 Kill-Switch
-
-Para pausar todas as operações automatizadas:
-
-```bash
-# Método 1: Via endpoint (requer auth)
-curl -X POST http://localhost:8000/api/admin/killswitch \
-  -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
-
-# Método 2: Via arquivo
-touch /tmp/killswitch.lock
-```
-
-## 📈 Projeções e Simulações
-
-```bash
-# Gerar projeções de receita (4 cenários)
-python tools/projections.py --output data/projections.csv
-
-# Simular tráfego para testes
-python tools/simulate_traffic.py --visitors 1000 --duration 3600
-```
-
-## 🤝 Contribuindo
-
-1. Fork o repositório
-2. Crie uma branch feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças atômicas (`git commit -m 'Add: AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request com checklist de revisão
-
-### PR Checklist
-- [ ] Testes passando (coverage >= 75%)
-- [ ] Lint/format (black, isort, flake8, mypy)
-- [ ] Sem secrets commitados
-- [ ] LGPD compliance verificado
-- [ ] Security checklist aplicado
-- [ ] Documentação atualizada
-- [ ] CHANGELOG.md atualizado
-
-## 📄 Licença
-
-MIT License - veja [LICENSE](./LICENSE) para detalhes.
-
-## ⚠️ Disclaimer
-
-Este projeto é para fins educacionais e operação ética. Qualquer uso fraudulento, ilegal ou que viole termos de serviço de terceiros é **estritamente proibido** e de responsabilidade do usuário final.
-
-## 📞 Suporte
-
-- 📚 Documentação: [/docs](./docs)
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/autocash-ultimate/issues)
-- 💬 Discussões: [GitHub Discussions](https://github.com/yourusername/autocash-ultimate/discussions)
-
----
-
-**Construído com ❤️ e responsabilidade ética**
+Projeto open-source focado em validação rápida. Ajuste conforme seu modelo de negócio.

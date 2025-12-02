@@ -1,0 +1,14 @@
+[
+  {
+    "id": "sponsor-1",
+    "title": "Ferramenta IA aliada ao seu negócio",
+    "cta": "Experimentar grátis",
+    "url": "https://example.com/afiliado-ia"
+  },
+  {
+    "id": "sponsor-2",
+    "title": "Curso Growth Hacking Free Tier",
+    "cta": "Liberar acesso",
+    "url": "https://example.com/growth?trk=free"
+  }
+]
